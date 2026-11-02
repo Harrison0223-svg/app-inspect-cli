@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "app-inspect-cli"
+dynamic = ["version"]
+description = "Pre-purchase inspection for App Store apps: lifetime rating vs. recent-review reality, from Apple's public feeds. No API key, no backend."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [{name = "Harrison0223-svg"}]
+keywords = ["app-store", "ios", "reviews", "ratings", "cli", "agent-skill"]
+classifiers = [
+  "Environment :: Console",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Utilities",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Harrison0223-svg/app-inspect-cli"
+Issues = "https://github.com/Harrison0223-svg/app-inspect-cli/issues"
+
+[project.scripts]
+app-inspect = "app_inspect.cli:main"
+
+[tool.setuptools]
+packages = ["app_inspect"]
+
+[tool.setuptools.dynamic]
+version = {attr = "app_inspect.__version__"}

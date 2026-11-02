@@ -1,0 +1,5 @@
+app                          lifetime  recent    gap  level      top complaint
+------------------------------------------------------------------------------
+Microsoft Authenticator         4.71★   1.67★  +3.04  big gap    login & account
+Twilio Authy                    4.67★   1.74★  +2.93  big gap    login & account
+Google Authenticator            4.85★   3.61★  +1.24  drifting   login & account

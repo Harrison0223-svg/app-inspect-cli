@@ -1,0 +1,40 @@
+Microsoft Authenticator — Microsoft Corporation
+  Productivity · Free · v6.8.57 · updated 12d ago
+
+  Lifetime rating        4.71★  (719,913 ratings)
+  Recent written reviews 1.67★  (500 reviews)
+  Last 30 days           1.85★  (114 reviews)
+  This version           2.06★  (54 reviews)
+  Gap                    +3.04  → big gap
+
+  5★ ███····················· 59
+  4★ ························ 9
+  3★ █······················· 24
+  2★ █······················· 25
+  1★ ██████████████████······ 383
+
+  By version (newest last)
+    6.8.52         1.52★  n=119
+    6.8.53         1.76★  n=42
+    6.8.54         1.76★  n=33
+    6.8.55         1.66★  n=96
+    6.8.56         1.67★  n=81
+    6.8.57         2.06★  n=54
+
+  What 1–2★ reviewers complain about
+    login & account          209  (51% of low reviews)
+      “Never works for me. Locked me out of all of my accounts because it never worked, then when I tried to log in again in this app, it kept asking for a verificati…”
+    crashes & bugs            36  (9% of low reviews)
+      “authenticator app for iphone. I click on the app for authenticator and instead of being in the app, it asks for a code from the app. There is no way to install…”
+    data loss & sync          19  (5% of low reviews)
+      “Didn’t sync. Got a new phone and it didn’t sync any of my accounts. Now it’s not working to try to sync up any of my accounts. Formerly good, but NEVER get a n…”
+    support                   19  (5% of low reviews)
+      “Horrible customer service. No way to contact anyone about issues when you can’t log in. In a logged out loop, Authenticator app needs me to log into account bu…”
+    update regressions         6  (1% of low reviews)
+      “Too many Sign-In prompts. Since the update I keep having to sign-in and approve authentication at random times of day. Probably daily. I wish work didn’t requi…”
+
+  Flags
+    ! Recent written reviews average 1.67★ vs 4.71★ lifetime (big gap, -3.04).
+
+  Verdict: Recent reviewers are far less happy than the headline rating suggests; the main complaint is login & account.
+  Sample: 2026-07-13 → 2026-10-31. Apple's lifetime number includes star-only ratings; the review feed holds only written reviews, which skew negative everywhere. Read the gap against other apps, not as an absolute score.
