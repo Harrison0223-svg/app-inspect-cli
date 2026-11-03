@@ -141,3 +141,11 @@ file for `--max-gap` monitoring, and smarter theme detection.
 ## License
 
 [MIT](LICENSE)
+
+## Watch an app over time (v0.2)
+
+```
+app-inspect watch 284882215 --history data/history.jsonl --fail-on-change
+```
+
+Each run appends a snapshot and tells you what moved since the last one (new version, rating fell, gap level changed, new regression). Exit code 4 with `--fail-on-change` when things got worse, so cron or CI can alert you. See `examples/watch-app.yml` for a weekly GitHub Action.

@@ -41,3 +41,6 @@ app-inspect search "<name>" --format json                             # find the
 - `ratings.sample_from/sample_to` is the window the reviews cover; busy apps cover only days.
 - Report: the two averages, the gap level, the main complaint, any regression, the verdict.
   Quote reviews sparingly and never present the verdict as Apple's.
+
+## Tracking over time
+`app-inspect watch <app> --history FILE [--fail-on-change]` appends a snapshot and prints changes since the last run (exit 4 if worse). Use it for recurring monitoring.

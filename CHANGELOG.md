@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-11-03
+
+### Added
+- `app-inspect watch <app>`: appends a snapshot (lifetime rating, recent average, gap level, version, flagged regressions) to a JSONL history file, prints what changed since the previous snapshot and a trend table.
+- `--fail-on-change` exits 4 when a rating fell, the gap level worsened or a new version regression appeared; `--min-drop`, `--no-save`, `--history`, `-f json`.
+- `examples/watch-app.yml`: a scheduled GitHub Action that keeps the history in your repo.
+
 ## [0.1.0] - 2026-11-02
 
 First working release (the repository previously held only an empty README).

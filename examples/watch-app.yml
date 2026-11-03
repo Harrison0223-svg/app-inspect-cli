@@ -1,0 +1,25 @@
+# Copy to .github/workflows/watch-app.yml in your own repo.
+# Weekly: snapshot an app's ratings, commit the history, fail the run when it got worse.
+name: Watch app ratings
+on:
+  schedule: [{cron: "0 6 * * 1"}]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install git+https://github.com/Harrison0223-svg/app-inspect-cli
+      - name: Snapshot
+        run: app-inspect watch 284882215 --history data/history.jsonl --fail-on-change
+      - name: Commit history
+        if: always()
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add data/history.jsonl
+          git diff --cached --quiet || git commit -m "Update rating history" && git push

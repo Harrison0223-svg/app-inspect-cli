@@ -42,3 +42,7 @@ app-inspect 983156458 --format json              # 给脚本和 AI agent 用
 ## 许可证
 
 MIT
+
+## 长期追踪（v0.2）
+
+`app-inspect watch <app> --history data/history.jsonl --fail-on-change`：每次运行记录一条快照，并说明相比上次的变化（新版本、评分下降、差距等级变化、新的版本退步）；变差时退出码为 4，可接入 cron / GitHub Action（见 `examples/watch-app.yml`）。

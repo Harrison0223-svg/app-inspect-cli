@@ -14,9 +14,11 @@ from typing import List, Optional
 from . import __version__
 from .analyze import inspect
 from .fetch import AppInspectError, MAX_REVIEW_PAGES, http_get_json, lookup, parse_app_ref, reviews, search
+from . import watch as watchmod
 from .render import compare_markdown, compare_table, search_table, to_json, to_markdown, to_text
 
 EXIT_GAP = 3
+EXIT_CHANGE = 4
 
 
 def _inspect_parser() -> argparse.ArgumentParser:
@@ -51,6 +53,20 @@ def _compare_parser() -> argparse.ArgumentParser:
     p.add_argument("-p", "--pages", type=int, default=MAX_REVIEW_PAGES)
     p.add_argument("-f", "--format", choices=("text", "json", "markdown"), default="text")
     p.add_argument("--days", type=int, default=30)
+    return p
+
+
+def _watch_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="app-inspect watch", description="Record a snapshot of an app and report what changed since the last one (run it from cron or a scheduled GitHub Action).")
+    p.add_argument("app")
+    p.add_argument("-c", "--country", default=None)
+    p.add_argument("-p", "--pages", type=int, default=MAX_REVIEW_PAGES)
+    p.add_argument("--days", type=int, default=30)
+    p.add_argument("--history", default="app-inspect-history.jsonl", help="JSONL file to append to (default ./app-inspect-history.jsonl)")
+    p.add_argument("--min-drop", type=float, default=0.1, help="rating change that counts as news (default 0.1)")
+    p.add_argument("--no-save", action="store_true", help="compare only; do not append a snapshot")
+    p.add_argument("--fail-on-change", action="store_true", help=f"exit {EXIT_CHANGE} when something got worse (rating fell, gap level worsened, new regression)")
+    p.add_argument("-f", "--format", choices=("text", "json"), default="text")
     return p
 
 
@@ -99,6 +115,29 @@ def main(argv: Optional[List[str]] = None, get=http_get_json, out=None) -> int:
                 print(compare_markdown(reports), file=out)
             else:
                 print(compare_table(reports), file=out)
+            return 0
+
+        if argv and argv[0] == "watch":
+            a = _watch_parser().parse_args(argv[1:])
+            report = _report(a.app, a.country, a.pages, a.days, get)
+            snap = watchmod.snapshot(report)
+            hist = watchmod.history_for(watchmod.load(a.history), snap)
+            prev = hist[-1] if hist else None
+            notes = watchmod.changes(prev, snap, a.min_drop)
+            if not a.no_save:
+                watchmod.append(a.history, snap)
+            if a.format == "json":
+                import json
+
+                print(json.dumps({"snapshot": snap, "previous": prev, "changes": notes}, indent=2, ensure_ascii=False), file=out)
+            else:
+                print(f"{snap['name']} (id {snap['app_id']}, {snap['country']}) - {len(hist) + (0 if a.no_save else 1)} snapshot(s)", file=out)
+                for n in notes:
+                    print(f"  - {n}", file=out)
+                print("", file=out)
+                print(watchmod.trend_text(hist + ([] if a.no_save else [snap])), file=out)
+            if a.fail_on_change and watchmod.worsened(prev, snap, a.min_drop):
+                return EXIT_CHANGE
             return 0
 
         if argv and argv[0] == "inspect":
