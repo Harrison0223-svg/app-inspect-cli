@@ -56,6 +56,16 @@ def _compare_parser() -> argparse.ArgumentParser:
     return p
 
 
+def _countries_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="app-inspect countries", description="Inspect one app across several storefronts (rating gaps often differ by country).")
+    p.add_argument("app", help="App Store id or URL")
+    p.add_argument("countries", nargs="+", help="two-letter storefront codes, e.g. us gb de jp")
+    p.add_argument("-p", "--pages", type=int, default=MAX_REVIEW_PAGES)
+    p.add_argument("--days", type=int, default=30)
+    p.add_argument("-f", "--format", choices=("text", "json", "markdown"), default="text")
+    return p
+
+
 def _watch_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="app-inspect watch", description="Record a snapshot of an app and report what changed since the last one (run it from cron or a scheduled GitHub Action).")
     p.add_argument("app")
@@ -107,6 +117,23 @@ def main(argv: Optional[List[str]] = None, get=http_get_json, out=None) -> int:
         if argv and argv[0] == "compare":
             a = _compare_parser().parse_args(argv[1:])
             reports = [_report(ref, a.country, a.pages, a.days, get) for ref in a.apps]
+            if a.format == "json":
+                import json
+
+                print(json.dumps(reports, indent=2, ensure_ascii=False), file=out)
+            elif a.format == "markdown":
+                print(compare_markdown(reports), file=out)
+            else:
+                print(compare_table(reports), file=out)
+            return 0
+
+        if argv and argv[0] == "countries":
+            a = _countries_parser().parse_args(argv[1:])
+            reports = []
+            for cc in a.countries:
+                rep = _report(a.app, cc, a.pages, a.days, get)
+                rep["app"] = dict(rep["app"], name=f"{rep['app'].get('name')} [{cc.lower()}]")
+                reports.append(rep)
             if a.format == "json":
                 import json
 

@@ -181,6 +181,12 @@ class CliTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn("| App | Lifetime |", out)
 
+    def test_countries(self):
+        code, out, _ = self.run_cli(["countries", "1234567890", "us", "jp"])
+        self.assertEqual(code, 0)
+        self.assertIn("[us]", out)
+        self.assertIn("[jp]", out)
+
     def test_unknown_app_is_clean_error(self):
         code, _, err = self.run_cli(["nothing here"], FakeApple(search_results=[]))
         self.assertEqual(code, 1)
