@@ -157,3 +157,10 @@ app-inspect countries 310633997 us gb de jp
 ```
 
 Ranks one app's storefronts by lifetime-vs-recent rating gap (v0.3.0).
+
+## Portfolio check (v0.4)
+
+```bash
+printf '# apps\n284882215\n389801252\n' > apps.txt
+app-inspect compare --file apps.txt --max-gap 1.0   # exit 3 if any app's recent rating trails lifetime by >1★
+```

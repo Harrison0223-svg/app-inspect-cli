@@ -48,7 +48,9 @@ def _search_parser() -> argparse.ArgumentParser:
 
 def _compare_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="app-inspect compare", description="Inspect several apps and rank them by rating gap.")
-    p.add_argument("apps", nargs="+", help="ids, App Store URLs or names")
+    p.add_argument("apps", nargs="*", help="ids, App Store URLs or names")
+    p.add_argument("--file", default=None, help="text file with one app per line (blank lines and # comments ignored); '-' reads stdin")
+    p.add_argument("--max-gap", type=float, default=None, help=f"exit {EXIT_GAP} if any app's gap exceeds this")
     p.add_argument("-c", "--country", default=None)
     p.add_argument("-p", "--pages", type=int, default=MAX_REVIEW_PAGES)
     p.add_argument("-f", "--format", choices=("text", "json", "markdown"), default="text")
@@ -116,7 +118,14 @@ def main(argv: Optional[List[str]] = None, get=http_get_json, out=None) -> int:
 
         if argv and argv[0] == "compare":
             a = _compare_parser().parse_args(argv[1:])
-            reports = [_report(ref, a.country, a.pages, a.days, get) for ref in a.apps]
+            refs = list(a.apps)
+            if a.file:
+                fh = sys.stdin if a.file == "-" else open(a.file, encoding="utf-8")
+                with fh:
+                    refs += [ln.strip() for ln in fh if ln.strip() and not ln.strip().startswith("#")]
+            if not refs:
+                raise AppInspectError("compare needs at least one app (arguments or --file).")
+            reports = [_report(ref, a.country, a.pages, a.days, get) for ref in refs]
             if a.format == "json":
                 import json
 
@@ -125,6 +134,8 @@ def main(argv: Optional[List[str]] = None, get=http_get_json, out=None) -> int:
                 print(compare_markdown(reports), file=out)
             else:
                 print(compare_table(reports), file=out)
+            if a.max_gap is not None and any((r["ratings"]["gap"] or 0) > a.max_gap for r in reports):
+                return EXIT_GAP
             return 0
 
         if argv and argv[0] == "countries":

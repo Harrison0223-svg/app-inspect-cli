@@ -187,6 +187,17 @@ class CliTests(unittest.TestCase):
         self.assertIn("[us]", out)
         self.assertIn("[jp]", out)
 
+    def test_compare_file_and_max_gap(self):
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as f:
+            f.write("# my apps\n1234567890\n\n")
+        code, out, _ = self.run_cli(["compare", "--file", f.name, "--max-gap", "-5"])
+        self.assertEqual(code, 3)
+        code, out, _ = self.run_cli(["compare", "--file", f.name])
+        self.assertEqual(code, 0)
+        code, _, err = self.run_cli(["compare"])
+        self.assertEqual(code, 1)
+
     def test_unknown_app_is_clean_error(self):
         code, _, err = self.run_cli(["nothing here"], FakeApple(search_results=[]))
         self.assertEqual(code, 1)
