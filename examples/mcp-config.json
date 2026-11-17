@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "app-inspect": {
+      "command": "app-inspect",
+      "args": ["mcp"]
+    }
+  }
+}

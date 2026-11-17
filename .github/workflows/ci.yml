@@ -29,3 +29,16 @@ jobs:
           python -m pip install .
           app-inspect --version
           app-inspect --help
+      - name: MCP stdio smoke test
+        run: |
+          printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}' '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | app-inspect mcp | python -c "import sys,json; r=[json.loads(l) for l in sys.stdin]; assert [m['id'] for m in r]==[1,2]; assert len(r[1]['result']['tools'])==4; print('mcp ok')"
+
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the composite action against the live App Store
+        uses: ./
+        with:
+          app: "284882215"
+          max-gap: "4"

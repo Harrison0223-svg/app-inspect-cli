@@ -3,6 +3,7 @@
     app-inspect <app id | App Store URL | name> [options]
     app-inspect search <term> [--country us]
     app-inspect compare <app> <app> [...] [options]
+    app-inspect mcp                     # MCP server over stdio for AI agents
 """
 
 from __future__ import annotations
@@ -154,6 +155,14 @@ def main(argv: Optional[List[str]] = None, get=http_get_json, out=None) -> int:
             else:
                 print(compare_table(reports), file=out)
             return 0
+
+        if argv and argv[0] == "mcp":
+            if len(argv) > 1:
+                print("usage: app-inspect mcp   (serves MCP over stdio; takes no options)", file=sys.stderr)
+                return 2
+            from . import mcp as mcpmod
+
+            return mcpmod.serve(get=get)
 
         if argv and argv[0] == "watch":
             a = _watch_parser().parse_args(argv[1:])

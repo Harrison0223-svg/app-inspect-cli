@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.5.0] - 2026-11-17
+
+### Added
+- `app-inspect mcp`: a zero-dependency Model Context Protocol server over stdio. Four read-only tools (`inspect_app`, `compare_apps`, `inspect_app_countries`, `search_apps`) return a Markdown summary plus structured JSON, so Claude Code, Claude Desktop, Cursor, Codex and any MCP client can check an app's review health with no API key and no hosted service. Errors (unknown app, network down) come back as tool errors; the server keeps running.
+- `action.yml`: use the repo as a GitHub Action (`uses: Harrison0223-svg/app-inspect-cli@v0.5.0`). Writes the report to the job summary and fails the job with `max-gap`. Works for one app (`app`) or a portfolio (`apps-file`).
+- `examples/mcp-config.json` and `examples/gap-check.yml`.
+
 ## [0.4.0] - 2026-11-07
 
 ### Added

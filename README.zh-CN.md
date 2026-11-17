@@ -46,3 +46,18 @@ MIT
 ## 长期追踪（v0.2）
 
 `app-inspect watch <app> --history data/history.jsonl --fail-on-change`：每次运行记录一条快照，并说明相比上次的变化（新版本、评分下降、差距等级变化、新的版本退步）；变差时退出码为 4，可接入 cron / GitHub Action（见 `examples/watch-app.yml`）。
+
+## MCP 服务器（v0.5）
+
+`app-inspect mcp` 是一个本地 stdio 的 MCP 服务器，零依赖、只读、无需 API Key，提供 `inspect_app`、`compare_apps`、`inspect_app_countries`、`search_apps` 四个工具。Claude Code：`claude mcp add app-inspect -- app-inspect mcp`；Claude Desktop / Cursor 见 `examples/mcp-config.json`。
+
+## GitHub Action（v0.5）
+
+```yaml
+- uses: Harrison0223-svg/app-inspect-cli@v0.5.0
+  with:
+    app: "284882215"
+    max-gap: "1.5"
+```
+
+报告写入 job summary；差距超过阈值时任务失败。批量检查用 `apps-file:`。

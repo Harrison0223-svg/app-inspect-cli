@@ -1,0 +1,14 @@
+# Weekly: fail (and show a report in the job summary) when your app's recent
+# written reviews trail its lifetime rating by more than 1.5 stars.
+name: App Store rating gap
+on:
+  schedule: [{cron: "0 6 * * 1"}]
+  workflow_dispatch:
+jobs:
+  gap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Harrison0223-svg/app-inspect-cli@v0.5.0
+        with:
+          app: "284882215"     # your App Store id
+          max-gap: "1.5"

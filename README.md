@@ -121,6 +121,32 @@ app-inspect 1234567890 --max-gap 1.5 --format markdown > review-report.md || ech
 install the CLI, and ask things like *"Is Authy still worth installing?"* or *"Compare the top three
 habit trackers by recent reviews."* The agent calls `app-inspect --format json` and reads the fields.
 
+## MCP server (v0.5)
+
+`app-inspect mcp` is a Model Context Protocol server over stdio, so any MCP client can call the same
+checks as tools (`inspect_app`, `compare_apps`, `inspect_app_countries`, `search_apps`). It is local,
+read-only, keyless and has no dependencies beyond Python.
+
+```sh
+claude mcp add app-inspect -- app-inspect mcp      # Claude Code
+```
+
+or add [`examples/mcp-config.json`](examples/mcp-config.json) to Claude Desktop / Cursor. Then ask:
+*"Is Microsoft Authenticator still worth using? Check recent App Store reviews."* Each tool returns a
+Markdown summary and the full structured report.
+
+## GitHub Action (v0.5)
+
+```yaml
+- uses: Harrison0223-svg/app-inspect-cli@v0.5.0
+  with:
+    app: "284882215"
+    max-gap: "1.5"      # fail the job when recent reviews trail the lifetime rating by >1.5★
+```
+
+The report lands in the job summary. Use `apps-file:` instead of `app:` for a portfolio. See
+[`examples/gap-check.yml`](examples/gap-check.yml).
+
 ## Data sources
 
 - iTunes Search and Lookup API: `https://itunes.apple.com/search`, `https://itunes.apple.com/lookup`

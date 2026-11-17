@@ -1,0 +1,68 @@
+name: "app-inspect"
+description: "Check an App Store app's lifetime rating against what recent reviewers say. Writes a Markdown report to the job summary and can fail the job when the gap is too big."
+author: "Harrison0223-svg"
+branding:
+  icon: "star"
+  color: "blue"
+inputs:
+  app:
+    description: "App Store id, URL or name (a single app)"
+    required: false
+  apps-file:
+    description: "Text file with one app per line; runs `compare --file` instead of a single inspection"
+    required: false
+  country:
+    description: "Two-letter storefront code (default: us)"
+    required: false
+    default: ""
+  days:
+    description: "Size of the 'recent' window in days"
+    required: false
+    default: "30"
+  max-gap:
+    description: "Fail the job (exit 3) when lifetime minus recent average exceeds this"
+    required: false
+    default: ""
+outputs:
+  report-file:
+    description: "Path of the Markdown report written by the action"
+    value: ${{ steps.run.outputs.report-file }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install app-inspect
+      shell: bash
+      run: python -m pip install --quiet "${{ github.action_path }}"
+    - name: Run app-inspect
+      id: run
+      shell: bash
+      env:
+        IN_APP: ${{ inputs.app }}
+        IN_FILE: ${{ inputs.apps-file }}
+        IN_COUNTRY: ${{ inputs.country }}
+        IN_DAYS: ${{ inputs.days }}
+        IN_MAX_GAP: ${{ inputs.max-gap }}
+      run: |
+        set -u
+        args=(--days "$IN_DAYS" --format markdown)
+        [ -n "$IN_COUNTRY" ] && args+=(--country "$IN_COUNTRY")
+        [ -n "$IN_MAX_GAP" ] && args+=(--max-gap "$IN_MAX_GAP")
+        report="${RUNNER_TEMP}/app-inspect-report.md"
+        if [ -n "$IN_FILE" ]; then
+          cmd=(app-inspect compare --file "$IN_FILE" "${args[@]}")
+        elif [ -n "$IN_APP" ]; then
+          cmd=(app-inspect "$IN_APP" "${args[@]}")
+        else
+          echo "::error::Set either 'app' or 'apps-file'"; exit 2
+        fi
+        set +e
+        "${cmd[@]}" > "$report"
+        code=$?
+        set -e
+        cat "$report" >> "$GITHUB_STEP_SUMMARY"
+        echo "report-file=$report" >> "$GITHUB_OUTPUT"
+        if [ "$code" -eq 3 ]; then echo "::error::Rating gap exceeds ${IN_MAX_GAP}"; fi
+        exit "$code"

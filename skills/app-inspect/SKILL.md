@@ -44,3 +44,6 @@ app-inspect search "<name>" --format json                             # find the
 
 ## Tracking over time
 `app-inspect watch <app> --history FILE [--fail-on-change]` appends a snapshot and prints changes since the last run (exit 4 if worse). Use it for recurring monitoring.
+
+## As an MCP server
+If the client supports MCP, `app-inspect mcp` exposes the same checks as tools (`inspect_app`, `compare_apps`, `inspect_app_countries`, `search_apps`). Prefer the tools over shelling out when they are available.
