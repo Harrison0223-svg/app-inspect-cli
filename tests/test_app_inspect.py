@@ -3,6 +3,8 @@ import json
 import os
 import sys
 import unittest
+from unittest.mock import patch
+from urllib.error import HTTPError
 from urllib.parse import parse_qs, urlsplit
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -35,6 +37,24 @@ class FetchTests(unittest.TestCase):
         self.assertEqual(len({r["id"] for r in revs}), 65)
         # 65 entries -> page 1 full, page 2 short, so no page 3 request
         self.assertEqual(sum("/customerreviews/" in u for u in fake.urls), 2)
+
+    def test_review_pagination_stops_on_later_http_404(self):
+        first_page = [entry(i, 4, "1.0", 1) for i in range(50)]
+        page_one = fetch.REVIEWS_URL.format(country="us", page=1, id="1234567890")
+        page_two = fetch.REVIEWS_URL.format(country="us", page=2, id="1234567890")
+
+        def urlopen(request, timeout):
+            if request.full_url == page_one:
+                return io.BytesIO(json.dumps({"feed": {"entry": first_page}}).encode())
+            if request.full_url == page_two:
+                raise HTTPError(page_two, 404, "Not Found", hdrs=None, fp=None)
+            self.fail(f"Unexpected request: {request.full_url}")
+
+        with patch("app_inspect.fetch.urllib.request.urlopen", side_effect=urlopen) as mock:
+            rows = fetch.reviews("1234567890", "us", pages=5)
+
+        self.assertEqual([r["id"] for r in rows], [item["id"]["label"] for item in first_page])
+        self.assertEqual([c.args[0].full_url for c in mock.call_args_list], [page_one, page_two])
 
     def test_single_entry_object(self):
         one = entry(1, 3, "1.0", 1)
