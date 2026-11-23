@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import unittest
+from urllib.parse import parse_qs, urlsplit
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -159,11 +160,27 @@ class CliTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn("Matched 'sample notes'", err)
 
-    def test_country_from_url(self):
-        fake = FakeApple()
-        code, _, _ = self.run_cli(["https://apps.apple.com/jp/app/x/id1234567890"], fake)
-        self.assertEqual(code, 0)
-        self.assertTrue(all("country=jp" in u or "/jp/rss/" in u for u in fake.urls))
+    def test_storefront_precedence(self):
+        app_id = "1234567890"
+        app_url = f"https://apps.apple.com/jp/app/x/id{app_id}"
+        cases = (
+            ("from URL", [app_url], "jp"),
+            ("explicit override", [app_url, "--country", "GB"], "gb"),
+            ("default for bare ID", [app_id], "us"),
+        )
+        for label, args, country in cases:
+            with self.subTest(case=label):
+                fake = FakeApple()
+                code, out, _ = self.run_cli([*args, "-f", "json"], fake)
+                self.assertEqual(code, 0)
+                self.assertEqual(json.loads(out)["country"], country)
+
+                lookup, *reviews = (urlsplit(url) for url in fake.urls)
+                self.assertEqual(lookup.path, "/lookup")
+                self.assertEqual(parse_qs(lookup.query)["country"], [country])
+                self.assertTrue(reviews)
+                for request in reviews:
+                    self.assertTrue(request.path.startswith(f"/{country}/rss/customerreviews/"))
 
     def test_max_gap_exit_code(self):
         code, _, _ = self.run_cli(["1234567890", "--max-gap", "1.0"])
