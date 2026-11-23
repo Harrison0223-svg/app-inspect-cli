@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [0.5.1] - 2026-11-23
+
+### Changed
+- Add bilingual quick-start examples to the README and expand the contribution guide with offline testing and issue-selection instructions.
+- No CLI behavior, output schema, workflow, or runtime dependency changes.
+
 ## [0.5.0] - 2026-11-17
 
 ### Added
