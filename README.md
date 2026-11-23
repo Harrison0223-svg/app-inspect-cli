@@ -126,8 +126,20 @@ the report prints the date range it covers.
 cron or CI job can alert you when recent reviews fall away from your headline rating:
 
 ```sh
-app-inspect 1234567890 --max-gap 1.5 --format markdown > review-report.md || echo "rating gap alert"
+if app-inspect 983156458 --max-gap 1.5 --format markdown > review-report.md; then
+  echo "Rating gap within threshold (or no recent rating to compare)."
+else
+  status=$?
+  case "$status" in
+    3) echo "Rating gap alert: see review-report.md." >&2 ;;
+    *) echo "app-inspect failed (exit $status); check its error output." >&2 ;;
+  esac
+  exit "$status"
+fi
 ```
+
+For an alert, the report is still written. A lookup or runtime failure is reported
+separately and retains its original exit code.
 
 ## Use it from Claude Code, Codex or other agents
 
