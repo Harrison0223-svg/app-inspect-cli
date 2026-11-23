@@ -36,9 +36,11 @@ def load(path: str) -> List[Dict[str, Any]]:
             line = line.strip()
             if line:
                 try:
-                    rows.append(json.loads(line))
+                    row = json.loads(line)
                 except ValueError:
                     continue  # tolerate a torn line
+                if isinstance(row, dict):
+                    rows.append(row)
     return rows
 
 

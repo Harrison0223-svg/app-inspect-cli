@@ -46,6 +46,30 @@ class WatchTests(unittest.TestCase):
             fh.write("{broken\n")
         self.assertEqual(len(watch.load(self.hist)), 1)
 
+    def test_watch_trend_skips_non_records(self):
+        first = {
+            "time": "2026-11-01T00:00:00Z",
+            "app_id": APP["trackId"],
+            "country": "us",
+            "version": "3.0.0",
+        }
+        second = dict(first, time="2026-11-02T00:00:00Z", version=APP["version"])
+        watch.append(self.hist, first)
+        with open(self.hist, "a", encoding="utf-8") as fh:
+            fh.write("null\n[]\n42\n{broken\n\n")
+        watch.append(self.hist, second)
+
+        args = ["watch", str(APP["trackId"]), "--history", self.hist, "--no-save"]
+        code, text = run(args, FakeApple())
+
+        self.assertEqual(code, 0)
+        self.assertIn("2 snapshot(s)", text)
+        self.assertEqual(
+            [line.split()[:2] for line in text.splitlines()[-2:]],
+            [[first["time"], first["version"]], [second["time"], second["version"]]],
+        )
+        self.assertEqual(watch.load(self.hist), [first, second])
+
     def test_improvement_is_not_worse(self):
         a = {"lifetime_average": 4.0, "gap_level": "drifting", "regressions": []}
         b = {"lifetime_average": 4.4, "gap_level": "in line", "regressions": []}
