@@ -27,6 +27,21 @@ pip install --user git+https://github.com/Harrison0223-svg/app-inspect-cli
 
 Python 3.9 or newer. Standard library only.
 
+## Quick start
+
+After installing, check the CLI and inspect a known app in the US storefront:
+
+```sh
+app-inspect --version
+app-inspect 983156458 --country us
+```
+
+Compare **lifetime** with **recent** and look at the number of recent reviews
+before drawing a conclusion. A small sample is a signal to investigate, not a
+verdict. App lookups need internet access; `--version` works offline.
+
+See [Contributing](CONTRIBUTING.md) for development and offline test commands.
+
 ## Use
 
 ```sh

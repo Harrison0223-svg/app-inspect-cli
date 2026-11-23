@@ -14,6 +14,19 @@ pipx install git+https://github.com/Harrison0223-svg/app-inspect-cli
 
 需要 Python 3.9+，只用标准库。
 
+## 快速上手
+
+安装后，先确认命令可用，再查一款美区 App：
+
+```sh
+app-inspect --version
+app-inspect 983156458 --country us
+```
+
+先对比历史总评分和近期评论均分，再看近期评论的样本数。样本少时只当作线索。查询需要联网；`--version` 可离线运行。
+
+开发和离线测试见 [贡献指南](CONTRIBUTING.md)。
+
 ## 用法
 
 ```sh
